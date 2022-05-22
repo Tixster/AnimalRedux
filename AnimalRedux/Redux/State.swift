@@ -12,5 +12,7 @@ struct AppState: ReduxState {
 }
 
 struct AnimalState: ReduxState {
-    var currentAnimal: String = ""
+    var current: String = ""
+    var fetchError: String?
+    var fetchInProgress: Bool = false
 }

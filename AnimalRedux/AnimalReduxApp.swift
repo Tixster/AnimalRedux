@@ -13,7 +13,8 @@ struct AnimalReduxApp: App {
     private let store: AppStore = .init(state: AppState(),
                                         rootReducer: RootReducer(),
                                         middlewares: [
-                                            AnimalMiddleware.middleware(service: AnimalService())
+                                            AnimalMiddleware.middleware(service: AnimalService()),
+                                            logMiddleware()
                                         ])
     
     var body: some Scene {

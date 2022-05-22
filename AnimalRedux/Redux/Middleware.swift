@@ -8,6 +8,11 @@
 import Foundation
 import Combine
 
+enum AnimalMiddlewareError: Error {
+    case unknown
+    case networkError
+}
+
 struct AnimalMiddleware {
     
     static func middleware(service: AnimalService) -> Middleware<AppState, ReduxAction> {
@@ -16,10 +21,18 @@ struct AnimalMiddleware {
                 return Empty().eraseToAnyPublisher()
             }
             switch action {
-            case .fetchAnimal:
+            case .getAnimal:
                 return service.generateAnimals()
                     .subscribe(on: DispatchQueue.main)
-                    .map({ AnimalAction.setCurrentAnimal(animal: $0)})
+                    .map({ AnimalAction.fetchComplete(animal: $0)})
+                    .catch { (error: AnimalServiceError) -> Just<ReduxAction> in
+                        switch error {
+                        case .unknown:
+                            return Just(AnimalAction.fetchError(error: AnimalMiddlewareError.unknown))
+                        case .networkError:
+                            return Just(AnimalAction.fetchError(error: AnimalMiddlewareError.networkError))
+                        }
+                    }
                     .eraseToAnyPublisher()
             default: break
             }
@@ -27,4 +40,11 @@ struct AnimalMiddleware {
         }
     }
     
+}
+
+func logMiddleware() -> Middleware<AppState, ReduxAction> {
+    return { state, action in
+        print("Triggered action: \(action)")
+        return Empty().eraseToAnyPublisher()
+    }
 }

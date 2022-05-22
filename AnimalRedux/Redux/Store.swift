@@ -13,9 +13,7 @@ typealias Middleware<ReduxState, ReduxAction> = (ReduxState, ReduxAction) -> Any
 
 final class Store<AppState, RootReducer>: ReduxStore where RootReducer: ReduxReducer,
                                                            RootReducer.State == AppState {
-    
-    private var tasks: Set<AnyCancellable> = []
-    
+
     @Published private(set) public var state: AppState
     private let reducer: RootReducer
     private var middlewares: [Middleware<AppState, ReduxAction>]

@@ -9,6 +9,6 @@ import Foundation
 
 enum AnimalAction: ReduxAction {
     case getAnimal
-    case fetchAnimal
-    case setCurrentAnimal(animal: String)
+    case fetchComplete(animal: String)
+    case fetchError(error: AnimalMiddlewareError?)
 }

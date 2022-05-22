@@ -24,11 +24,20 @@ struct AnimalReducer: ReduxReducer {
         guard let action = action as? AnimalAction else { return }
         switch action {
         case .getAnimal:
-            state.currentAnimal = getAnimtal()
-        case .fetchAnimal:
-            state.currentAnimal = "Loading..."
-        case .setCurrentAnimal(let animalName):
-            state.currentAnimal = animalName
+            state.fetchInProgress = true
+            state.fetchError = nil
+        case .fetchError(let error):
+            state.fetchInProgress = false
+            switch error {
+            case .networkError:
+                state.fetchError = "Oops!.  It seems someone made a mistake!"
+            default:
+                state.fetchError = "I'm sorry, but the server went away"
+            }
+        case .fetchComplete(let animal):
+            state.fetchError = nil
+            state.fetchInProgress = false
+            state.current = animal
         }
     }
     

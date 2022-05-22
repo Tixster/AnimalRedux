@@ -8,15 +8,27 @@
 import Combine
 import Foundation
 
+enum AnimalServiceError: Error, CaseIterable {
+    case unknown
+    case networkError
+}
+
 struct AnimalService {
     
-    func generateAnimals() -> AnyPublisher<String, Never> {
+    var requestNumber: Int = 0
+    
+    func generateAnimals() -> AnyPublisher<String, AnimalServiceError> {
         let animals = ["Cat", "Dog", "Crow", "Horse", "Iguana", "Cow", "Racoon"]
         let number = Double.random(in: 0..<5)
-        return Future<String, Never> { promise in
-            DispatchQueue.main.asyncAfter(deadline: .now() + number) {
-                let result = animals.randomElement() ?? ""
-                promise(.success(result))
+        return Future<String, AnimalServiceError> { promise in
+            DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + number) {
+                let randomError = Int.random(in: 0..<2)
+                if randomError != 0 {
+                    let result = animals.randomElement() ?? ""
+                    promise(.success(result))
+                }
+                promise(.failure(AnimalServiceError.allCases.randomElement()!))
+                
             }
         }
         .eraseToAnyPublisher()
